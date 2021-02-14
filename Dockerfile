@@ -18,6 +18,9 @@ RUN apt-get upgrade -y
 # install python packages
 RUN apt-get install -y python-pip
 RUN pip install --upgrade pip
+# curl https://bootstrap.pypa.io/2.7/get-pip.py --output get-pip.py   # get pip for python2
+COPY get-pip.py ./get-pip.py
+RUN python ./get-pip.
 COPY requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
 
