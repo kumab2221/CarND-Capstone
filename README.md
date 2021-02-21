@@ -29,6 +29,15 @@ Run the docker file
 ```bash
 docker run -p 4567:4567 -v $PWD:/capstone -v /tmp/log:/root/.ros/ --rm -it capstone
 ```
+### Websocketio
+```
+./install-linux.sh
+```
+
+### Initial setting
+```
+echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+```
 
 ### Port Forwarding
 To set up port forwarding, please refer to the "uWebSocketIO Starter Guide" found in the classroom (see Extended Kalman Filter Project lesson).
