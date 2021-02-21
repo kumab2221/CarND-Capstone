@@ -24,6 +24,7 @@ class TLDetector(object):
         self.lights = []
 
         self.waypoints_2d = None
+        self.waypoint_tree = None
 
         sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         sub2 = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
@@ -91,7 +92,7 @@ class TLDetector(object):
             self.last_state = self.state
             light_wp = light_wp if state == TrafficLight.RED else -1
             self.last_wp = light_wp
-            self.publish(Int32(light_wp))
+            self.upcoming_red_light_pub.publish(Int32(light_wp))
         else:
             self.upcoming_red_light_pub.publish(Int32(self.last_wp))
         self.state_count += 1
@@ -149,7 +150,7 @@ class TLDetector(object):
             diff = len(self.waypoints.waypoints)
             for i, light in enumerate(self.lights):
                 line = stop_line_positions[i]
-                temp_wp_idx = self.get_closest_waypoint_idx(line[0], line[1])
+                temp_wp_idx = self.get_closest_waypoint(line[0], line[1])
                 d = temp_wp_idx - car_wp_idx
                 if d>=0 and d<diff:
                     diff = d
@@ -157,7 +158,7 @@ class TLDetector(object):
                     line_wp_idx = temp_wp_idx
         if closest_light:
             state = self.get_light_state(closest_light)
-            return light_wp, state
+            return line_wp_idx, state
         self.waypoints = None
         return -1, TrafficLight.UNKNOWN
 
