@@ -108,8 +108,11 @@ class TLDetector(object):
 
         """
         #TODO implement
-        closest_idx = self.waypoint_tree.query([x, y], 1)[1]
-        return closest_idx
+        if self.waypoint_tree:
+            closest_idx = self.waypoint_tree.query([x, y], 1)[1]
+            return closest_idx
+        
+        return -1
 
     def get_light_state(self, light):
         """Determines the current color of the traffic light
@@ -124,11 +127,13 @@ class TLDetector(object):
         if(not self.has_image):
             self.prev_light_loc = None
             return False
+        
+        if (self.camera_image):
+            cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+            #Get classification
+            return self.light_classifier.get_classification(cv_image)
 
-        cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
-
-        #Get classification
-        return self.light_classifier.get_classification(cv_image)
+        return False
 
     def process_traffic_lights(self):
         """Finds closest visible traffic light, if one exists, and determines its
