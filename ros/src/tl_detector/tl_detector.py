@@ -7,10 +7,10 @@ from styx_msgs.msg import Lane
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 from light_classification.tl_classifier import TLClassifier
+from scipy.spatial import KDTree
 import tf
 import cv2
 import yaml
-from scipy.spatial import KDTree
 
 STATE_COUNT_THRESHOLD = 3
 
@@ -20,11 +20,10 @@ class TLDetector(object):
 
         self.pose = None
         self.waypoints = None
-        self.camera_image = None
-        self.lights = []
-
         self.waypoints_2d = None
         self.waypoint_tree = None
+        self.camera_image = None
+        self.lights = []
 
         sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         sub2 = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
@@ -111,9 +110,9 @@ class TLDetector(object):
         if self.waypoint_tree:
             closest_idx = self.waypoint_tree.query([x, y], 1)[1]
             return closest_idx
-        
-        return -1
 
+        return -1
+        
     def get_light_state(self, light):
         """Determines the current color of the traffic light
 
@@ -124,6 +123,8 @@ class TLDetector(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
         """
+        return light.state
+
         if(not self.has_image):
             self.prev_light_loc = None
             return False
@@ -166,6 +167,7 @@ class TLDetector(object):
             return line_wp_idx, state
         self.waypoints = None
         return -1, TrafficLight.UNKNOWN
+
 
 if __name__ == '__main__':
     try:
